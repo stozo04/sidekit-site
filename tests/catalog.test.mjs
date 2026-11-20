@@ -74,6 +74,10 @@ test("an entry it cannot read is an error, not a silent gap", () => {
   );
   assert.throws(() => parse(DOWNLOAD + reordered), /Read 1 of 2 tools/);
   assert.throws(() => parse(DOWNLOAD + SUMMARIZE.replace("Tool(name:", ".init(name:")), /Read 1 of 2 tools/);
+  assert.throws(
+    () => parse(DOWNLOAD + SUMMARIZE.replace('name: "Summarize"', "name: Self.summarizeName")),
+    /Read 1 of 2 tools/,
+  );
   assert.throws(() => parse("enum ToolCatalog {}"), /format has changed/);
 });
 
@@ -100,6 +104,14 @@ test("an unknown category is an error", () => {
 
 test("isImplemented in an unknown shape is an error", () => {
   assert.throws(() => parseImplementedCases("enum ToolInput {}"), /isImplemented/);
+  assert.throws(
+    () => parseImplementedCases(TOOL_SWIFT.replace(".link, .trimVideo,", ".link, .mac(.keepAwake),")),
+    /isImplemented/,
+  );
+  assert.throws(
+    () => parseImplementedCases(TOOL_SWIFT.replace("            false", "            true && false")),
+    /isImplemented/,
+  );
 });
 
 test("reads the app version", () => {

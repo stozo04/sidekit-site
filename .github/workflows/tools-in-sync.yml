@@ -26,4 +26,6 @@ jobs:
         with:
           node-version: 24
       - name: Compare src/data/tools.json with the app's latest release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: npm run sync-tools:check

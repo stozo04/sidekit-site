@@ -15,14 +15,21 @@ const fromIndex = args.indexOf("--from");
 const localCheckout = fromIndex >= 0 ? args[fromIndex + 1] : undefined;
 if (fromIndex >= 0 && !localCheckout) throw new Error("--from needs the path of a local checkout of the app.");
 
-async function fetchOk(url) {
-  const response = await fetch(url);
+const githubToken = process.env.GITHUB_TOKEN;
+
+async function fetchOk(url, headers = {}) {
+  const response = await fetch(url, { headers });
   if (!response.ok) throw new Error(`Could not fetch ${url}: HTTP ${response.status}`);
   return response;
 }
 
 async function latestReleaseTag() {
-  const release = await (await fetchOk(`https://api.github.com/repos/${APP_REPO}/releases/latest`)).json();
+  const release = await (
+    await fetchOk(
+      `https://api.github.com/repos/${APP_REPO}/releases/latest`,
+      githubToken ? { Authorization: `Bearer ${githubToken}` } : {},
+    )
+  ).json();
   return release.tag_name;
 }
 
